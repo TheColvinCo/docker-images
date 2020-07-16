@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine AS api_platform_php
+FROM php:7.4-fpm-alpine
 
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -16,7 +16,7 @@ RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
-COPY docker/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
+COPY rootfs/usr/local/etc/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
 
 RUN set -eux; \
 	{ \
@@ -70,12 +70,12 @@ RUN set -eux; \
 	chmod +x bin/console; sync
 VOLUME /srv/api/var
 
-COPY docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
+COPY docker-healthcheck.sh /usr/local/bin/docker-healthcheck
 RUN chmod +x /usr/local/bin/docker-healthcheck
 
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 
-COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["docker-entrypoint"]
