@@ -47,23 +47,23 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
 ARG APP_ENV=prod
 
 # prevent the reinstallation of vendors at every changes in the source code
-COPY composer.json composer.lock symfony.lock ./
-RUN set -eux; \
+ONBUILD COPY composer.json composer.lock symfony.lock ./
+ONBUILD RUN set -eux; \
 	composer install --prefer-dist --no-dev --no-scripts --no-progress --no-suggest; \
 	composer clear-cache
 
 # do not use .env files in production
-COPY .env ./
-RUN composer dump-env prod; \
+ONBUILD COPY .env ./
+ONBUILD RUN composer dump-env prod; \
 	rm .env
 
 # copy only specifically what we need
-COPY bin bin/
-COPY config config/
-COPY public public/
-COPY src src/
+ONBUILD COPY bin bin/
+ONBUILD COPY config config/
+ONBUILD COPY public public/
+ONBUILD COPY src src/
 
-RUN set -eux; \
+ONBUILD RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer run-script --no-dev post-install-cmd; \
