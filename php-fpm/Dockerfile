@@ -16,7 +16,7 @@ RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
-COPY rootfs/usr/local/etc/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
+COPY ./rootfs/usr/local/etc/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
 
 RUN set -eux; \
 	{ \
