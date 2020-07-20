@@ -26,6 +26,12 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		composer install --prefer-dist --no-progress --no-suggest --no-interaction
 	fi
 
+	echo "Cache clear"
+	bin/console cache:clear
+
+	echo "Assets install"
+	bin/console assets:install
+
 # @todo Clear cache
 # @todo Reactivate this
 #	echo "Waiting for db to be ready..."
