@@ -3,6 +3,6 @@
 This image is based on opositatest/varnish-jwt to allow caching endpoint with enabled JWT.
 These environment variables can be set to change the behaviour of the provided VCL:
 
-`BACKEND_HOST` (default 'api')
+`BACKEND_HOST` (default to 'api')
 
-`ENV` (deafault 'prod')
+`ENV` (default to 'prod')
