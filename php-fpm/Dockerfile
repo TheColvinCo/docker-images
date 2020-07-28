@@ -7,6 +7,7 @@ RUN apk add --no-cache \
 		file \
 		gettext \
 		git \
+		coreutils \
 	;
 
 # INSTALL PHP DEPENDENCIES
