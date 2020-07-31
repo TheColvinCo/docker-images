@@ -51,13 +51,15 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
-# Datadog
-RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/DataDog/dd-trace-php/releases/download/$DATADOG_VERSION/datadog-php-tracer_${DATADOG_VERSION}_noarch.apk -O datadog-php-tracer.apk \
-      && apk add datadog-php-tracer.apk --allow-untrusted \
-      && rm datadog-php-tracer.apk; fi
+
 
 # build for production
 ARG APP_ENV=prod
+
+# Datadog
+ONBUILD RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/DataDog/dd-trace-php/releases/download/$DATADOG_VERSION/datadog-php-tracer_${DATADOG_VERSION}_noarch.apk -O datadog-php-tracer.apk \
+      && apk add datadog-php-tracer.apk --allow-untrusted \
+      && rm datadog-php-tracer.apk; fi
 
 # prevent the reinstallation of vendors at every changes in the source code
 ONBUILD COPY composer.json composer.lock symfony.lock ./
