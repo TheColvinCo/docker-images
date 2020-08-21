@@ -28,7 +28,16 @@ acl invalidators {
 sub vcl_recv {
   # Remove the "Forwarded" HTTP header if exists (security)
   unset req.http.forwarded;
-
+  # To allow API Platform to ban by cache tags
+  if (req.method == "BAN") {
+    if (client.ip !~ invalidators) {
+      return (synth(405, "Not allowed"));
+    }
+    if (req.http.ApiPlatform-Ban-Regex) {
+      ban("obj.http.Cache-Tags ~ " + req.http.ApiPlatform-Ban-Regex);
+      return (synth(200, "Ban added"));
+    }
+  }
   #bypass cache when no-cache or private header is present
   if (req.http.cache-control ~ "(no-cache|private)" ||
       req.http.pragma ~ "no-cache") {
@@ -39,6 +48,7 @@ sub vcl_recv {
     return (pass);
   }
 
+  # For health checks
   if (req.method == "GET" && req.url == "/healthz") {
     return (synth(200, "OK"));
   }
