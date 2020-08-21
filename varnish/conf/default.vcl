@@ -37,6 +37,7 @@ sub vcl_recv {
       ban("obj.http.Cache-Tags ~ " + req.http.ApiPlatform-Ban-Regex);
       return (synth(200, "Ban added"));
     }
+    return (synth(400, "ApiPlatform-Ban-Regex HTTP header must be set."));
   }
   #bypass cache when no-cache or private header is present
   if (req.http.cache-control ~ "(no-cache|private)" ||
