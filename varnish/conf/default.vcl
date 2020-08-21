@@ -12,9 +12,18 @@ sub vcl_init {
 
 
 backend default {
-  .host = "nginx";
+  .host = "%%BACKEND_HOST%%";
+  .port = "80";
 }
 
+# Hosts allowed to send BAN requests
+acl invalidators {
+  "localhost";
+  # local Docker/Kubernetes network
+  "10.0.0.0"/8;
+  "172.16.0.0"/12;
+  "192.168.0.0"/16;
+}
 
 sub vcl_recv {
   # Remove the "Forwarded" HTTP header if exists (security)
@@ -28,6 +37,10 @@ sub vcl_recv {
 
   if (req.method != "GET" && req.method != "HEAD") {
     return (pass);
+  }
+
+  if (req.method == "GET" && req.url == "/healthz") {
+    return (synth(200, "OK"));
   }
 
   if(req.http.Authorization && req.http.Authorization ~ "Bearer") {
@@ -76,19 +89,29 @@ sub vcl_hit {
         // A pure unadultered hit, deliver it
         return (deliver);
     }
+    if (std.healthy(req.backend_hint)) {
+        # The backend is healthy
+        # Fetch the object from the backend
+        return (restart);
+    }
     if (obj.ttl + obj.grace > 0s) {
         // Object is in grace, deliver it
         // Automatically triggers a background fetch
         return (deliver);
     }
 
-    return (pass);
+    # No valid object to deliver
+    # No healthy backend to handle request
+    # Return error
+    return (synth(503, "API is down"));
 }
 
 
 sub vcl_deliver {
   # Don't send cache tags related headers to the client
   unset resp.http.url;
+  # Remove Via header with varnish details
+  unset resp.http.Via;
   # Comment the following line to send the "Cache-Tags" header to the client (e.g. to use CloudFlare cache tags)
   unset resp.http.Cache-Tags;
 
