@@ -100,21 +100,13 @@ sub vcl_hit {
         // A pure unadultered hit, deliver it
         return (deliver);
     }
-    if (std.healthy(req.backend_hint)) {
-        # The backend is healthy
-        # Fetch the object from the backend
-        return (restart);
-    }
     if (obj.ttl + obj.grace > 0s) {
         // Object is in grace, deliver it
         // Automatically triggers a background fetch
         return (deliver);
     }
 
-    # No valid object to deliver
-    # No healthy backend to handle request
-    # Return error
-    return (synth(503, "API is down"));
+    return (pass);
 }
 
 
