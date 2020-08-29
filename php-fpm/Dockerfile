@@ -72,6 +72,7 @@ ONBUILD RUN composer dump-env prod; \
 # copy only specifically what we need
 ONBUILD COPY bin bin/
 ONBUILD COPY config config/
+ONBUILD COPY migrations migrations/
 ONBUILD COPY public public/
 ONBUILD COPY src src/
 
