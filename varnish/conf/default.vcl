@@ -10,7 +10,6 @@ sub vcl_init {
   new v = crypto.verifier(sha256, std.getenv("PUBLIC_KEY"));
 }
 
-
 backend default {
   .host = "%%BACKEND_HOST%%";
   .port = "80";
@@ -54,7 +53,7 @@ sub vcl_recv {
     return (synth(200, "OK"));
   }
 
-  if(req.http.Authorization && req.http.Authorization ~ "Bearer") {
+  if(req.url != "/refresh_token" && req.url != "/authentication_token") {
       set req.http.x-token =  regsuball(req.http.Authorization, "Bearer ", "");
 
       set req.http.tmpHeader = regsub(req.http.x-token,"([^\.]+)\.[^\.]+\.[^\.]+","\1");
