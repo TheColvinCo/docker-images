@@ -53,7 +53,7 @@ sub vcl_recv {
     return (synth(200, "OK"));
   }
 
-  if(req.url != "/refresh_token" && req.url != "/authentication_token") {
+  if(req.url != "/refresh_token" && req.url != "/authentication_token" && req.url != "/docs") {
       set req.http.x-token =  regsuball(req.http.Authorization, "Bearer ", "");
 
       set req.http.tmpHeader = regsub(req.http.x-token,"([^\.]+)\.[^\.]+\.[^\.]+","\1");
