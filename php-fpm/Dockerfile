@@ -18,7 +18,7 @@ RUN apk add --no-cache \
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
 RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis curl
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
 COPY ./rootfs/usr/local/etc/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
@@ -34,7 +34,7 @@ RUN set -eux; \
 ENV COMPOSER_ALLOW_SUPERUSER=1
 # install Symfony Flex globally to speed up download of Composer packages (parallelized prefetching)
 RUN set -eux; \
-	composer global require "symfony/flex" --prefer-dist --no-progress --no-suggest --classmap-authoritative; \
+	composer global require "symfony/flex" --prefer-dist --no-progress --classmap-authoritative; \
 	composer clear-cache
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 
@@ -60,7 +60,7 @@ ONBUILD RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/Da
 # prevent the reinstallation of vendors at every changes in the source code
 ONBUILD COPY composer.json composer.lock symfony.lock ./
 ONBUILD RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-scripts --no-progress --no-suggest; \
+	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
 	composer clear-cache
 
 # do not use .env files in production
