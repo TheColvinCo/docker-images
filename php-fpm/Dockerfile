@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0.0RC5-fpm-alpine
 
 ONBUILD ARG DATADOG_VERSION=0.48.3
 ONBUILD ARG INSTALL_DATADOG=false
