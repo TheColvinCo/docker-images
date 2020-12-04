@@ -60,7 +60,7 @@ ONBUILD RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/Da
 # prevent the reinstallation of vendors at every changes in the source code
 ONBUILD COPY composer.json composer.lock symfony.lock ./
 ONBUILD RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
+	composer install --prefer-dist --no-dev --no-scripts --no-progress --ignore-platform-reqs; \
 	composer clear-cache
 
 # do not use .env files in production
@@ -77,7 +77,7 @@ ONBUILD COPY src src/
 
 ONBUILD RUN set -eux; \
 	mkdir -p var/cache var/log; \
-	composer dump-autoload --classmap-authoritative --no-dev --ignore-platform-reqs; \
+	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 VOLUME /srv/api/var
