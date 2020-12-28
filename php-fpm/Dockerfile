@@ -1,6 +1,6 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0-fpm-alpine
 
-ONBUILD ARG DATADOG_VERSION=0.48.3
+ONBUILD ARG DATADOG_VERSION=0.52.0
 ONBUILD ARG INSTALL_DATADOG=false
 ONBUILD ARG INSTALL_BLACKFIRE=false
 
@@ -16,7 +16,7 @@ RUN apk add --no-cache \
 
 # INSTALL PHP DEPENDENCIES
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
-RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis curl
+RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis curl amqp
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -60,7 +60,7 @@ ONBUILD RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/Da
 # prevent the reinstallation of vendors at every changes in the source code
 ONBUILD COPY composer.json composer.lock symfony.lock ./
 ONBUILD RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
+	composer install --prefer-dist --no-dev --no-scripts --no-progress --ignore-platform-reqs; \
 	composer clear-cache
 
 # do not use .env files in production
