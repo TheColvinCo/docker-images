@@ -15,15 +15,6 @@ backend default {
   .port = "80";
 }
 
-# Hosts allowed to send BAN requests
-acl invalidators {
-  "localhost";
-  # local Docker/Kubernetes network
-  "10.0.0.0"/8;
-  "172.16.0.0"/12;
-  "192.168.0.0"/16;
-}
-
 sub vcl_recv {
   # Remove the "Forwarded" HTTP header if exists (security)
   unset req.http.forwarded;
