@@ -20,9 +20,9 @@ sub vcl_recv {
   unset req.http.forwarded;
   # To allow API Platform to ban by cache tags
   if (req.method == "BAN") {
-    if (req.http.x-varnish-token != std.getenv("VARNISH_PURGE_TOKEN")) {
-      return (synth(405, "Not allowed"));
-    }
+#    if (req.http.x-varnish-token != std.getenv("VARNISH_PURGE_TOKEN")) {
+#      return (synth(405, "Not allowed"));
+#    }
     if (req.http.ApiPlatform-Ban-Regex) {
       ban("obj.http.Cache-Tags ~ " + req.http.ApiPlatform-Ban-Regex);
       return (synth(200, "Ban added"));
