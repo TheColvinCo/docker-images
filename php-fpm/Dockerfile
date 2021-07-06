@@ -2,7 +2,6 @@ FROM php:8.0-fpm-alpine
 
 ONBUILD ARG DATADOG_VERSION=0.52.0
 ONBUILD ARG INSTALL_DATADOG=false
-ONBUILD ARG INSTALL_BLACKFIRE=false
 
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -42,15 +41,6 @@ WORKDIR /srv/api
 
 # build for production
 ARG APP_ENV=prod
-
-# Blackfire
-ONBUILD RUN if [ "$INSTALL_BLACKFIRE" = "true" ] ; then version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/amd64/$version \
-    && mkdir -p /tmp/blackfire \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
-    && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
-    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz; fi
 
 # Datadog
 ONBUILD RUN if [ "$INSTALL_DATADOG" = "true" ] ; then wget https://github.com/DataDog/dd-trace-php/releases/download/$DATADOG_VERSION/datadog-php-tracer_${DATADOG_VERSION}_noarch.apk -O datadog-php-tracer.apk \
