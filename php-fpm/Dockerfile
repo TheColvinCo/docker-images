@@ -14,7 +14,7 @@ RUN apk add --no-cache \
 	;
 
 # INSTALL PHP DEPENDENCIES
-COPY --from=mlocati/php-extension-installer:1.2.39 /usr/bin/install-php-extensions /usr/bin/install-php-extensions
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
 RUN install-php-extensions intl pcntl pdo_mysql zip apcu opcache redis curl amqp
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
